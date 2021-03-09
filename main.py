@@ -1,20 +1,25 @@
 import os, shutil
-from src.extract_noises import extract_noises
-from src.extract_reference import extract_reference
-from src.estimate_corr import estimate_corr
+from src.noise import extract_noise
+from src.reference import extract_reference
+from src.correlation import extract_correlation
+from src.threshold import extract_threshold
 
 
 def main():
-    #shutil.rmtree('./noises', ignore_errors=True)
-    #shutil.rmtree('./references', ignore_errors=True)
     
     models_cam = os.listdir('./dataset')
     
-    #for model in models_cam: 
-    #    extract_noises(model)
-    #    extract_reference(model)
-        
-    estimate_corr(models_cam)
+    #shutil.rmtree('./noise', ignore_errors=True)
+    #extract_noise(models_cam)
+    
+    #shutil.rmtree('./reference', ignore_errors=True)
+    #extract_reference(models_cam)    
+    
+    #shutil.rmtree('./correlation', ignore_errors=True)
+    #extract_correlation(models_cam)
+    
+    shutil.rmtree('./histogram', ignore_errors=True)
+    extract_threshold(models_cam)
 
             
 if __name__ == '__main__':
