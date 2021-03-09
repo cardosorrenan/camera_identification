@@ -7,23 +7,24 @@ from skimage.io import imsave
 def extract_reference(model):
     path_noises = './noises/' + model + '/'
     noises = os.listdir(path_noises)
-
+    print(noises)
     w, h = Image.open(path_noises + noises[0]).size
     N = len(noises)
 
-    arr = np.zeros((w, h, 3), np.float)
+    arr = np.zeros((w, h), np.float)
 
     for im in noises:
         try:
-            imarr = np.asarray(Image.open(path_noises + im), dtype = np.float64)
-            arr = arr + (imarr/N)
+            imarr = np.asarray(Image.open(path_noises + im))
+            arr = arr + imarr
         except Exception as e:
             print(e)
     
-    reference_arr = np.array(np.round(arr), dtype=np.float64)
+    arr = arr / N
     
+   
     path_reference = './references/'
     if not os.path.exists(path_reference):
         os.makedirs(path_reference)
         
-    imsave(arr=reference_arr, fname= path_reference + model + '.jpg')
+    imsave(arr=arr, fname= path_reference + model + '.jpg')

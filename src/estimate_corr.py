@@ -1,39 +1,46 @@
 from PIL import Image
 import numpy as np
 from numpy import linalg as LA
+import os
+import json
+
 
 def estimate_corr(models_cam):
     
-    models_cam = models_cam[0:1]
+    opts = dict.fromkeys(('taken', 'not_taken'), [])    
+    corr_cam = dict.fromkeys(tuple(models_cam), opts)
     
-    for model in models_cam:
+    for model_i in models_cam:
+               
+        rpn = Image.open(f'./references/{model_i}.jpg')
+        rpn = np.asarray(rpn)
+        p = (rpn - rpn.mean()).flatten()
         
-        # 1. P = GET THE CORR FOR THE ALL NOISES (CAMERA 'C')
-        # 2. P' = GET THE CORR FOR THE ALL NOISES (NOT CAMERA 'C')  
-        # 3. TRANSFORM P e P' IN DISTRIBUITON 
-        # 4. GET THRESHOLD NEYMAN PEARSON
-        
-        
-        path_noise = f'./noises/{model}/(iP4s)248.jpg'
-        noise = Image.open(path_noise)
-        noise = np.asarray(noise)
-        
-        path_reference = f'./references/{model}.jpg'
-        reference = Image.open(path_reference)
-        reference = np.asarray(noise)
-        
-        n = noise
-        n_mean = noise.mean()
-        aux_n = n - n_mean
-        
-        p = reference
-        p_mean = reference.mean()
-        aux_p = p - p_mean
+        for model_j in models_cam:
+            noises = os.listdir(f'./noises/{model_j}')
+                
+            for noise in noises:
+                 print(noise)
+                 spn = Image.open(f'./noises/{model_j}/{noise}')
+                 spn = np.asarray(spn)
+                 n = (spn - spn.mean()).flatten()
+                 corr = np.corrcoef(n, p)[0][1]
+                 
+                 
+            if model_i == model_j:
+                corr_cam[model_i]['taken'].append(corr)                     
+            else:                
+                corr_cam[model_i]['not_taken'].append(corr)
+
+                             
+                
     
-        corr = np.dot(aux_n, aux_p.T) / ( LA.norm(aux_n) * LA.norm(aux_p) )
+    with open('result.json', 'w') as fp:
+        json.dump(corr_cam, fp)
+
+            
         
         
-        print(corr.shape)
     
     
     

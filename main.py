@@ -5,12 +5,12 @@ from src.estimate_corr import estimate_corr
 
 
 def main():
-    # shutil.rmtree('./noises', ignore_errors=True)
-    # shutil.rmtree('./references', ignore_errors=True)
+    #shutil.rmtree('./noises', ignore_errors=True)
+    #shutil.rmtree('./references', ignore_errors=True)
     
     models_cam = os.listdir('./dataset')
     
-    # for model in models_cam: 
+    #for model in models_cam: 
     #    extract_noises(model)
     #    extract_reference(model)
         

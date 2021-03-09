@@ -4,18 +4,24 @@ from PIL import Image
 from skimage.io import imsave
 
 
+def rgb2gray(rgb):
+    r, g, b = rgb[:,:,0], rgb[:,:,1], rgb[:,:,2]
+    gray = 0.2989 * r + 0.5870 * g + 0.1140 * b
+    return gray
+
+
 def get_sigma(coeff, W_values, sigma_0):
     values = []
     for w in W_values:
-        x = (coeff**2 - sigma_0**2)/w**2
-        x_sum = x.sum()
+        x = coeff**2 - sigma_0**2
+        x_sum = x.sum()/w**2
         values.append(x_sum if x_sum > 0 else 0)        
     sigma = min(values)        
     return sigma
 
 
 def wiener_filter(coeff, sigma, sigma_0):
-    filtered_coeff = coeff*(sigma/(sigma - sigma_0**2))
+    filtered_coeff = coeff*(sigma/(sigma + sigma_0**2))
     return filtered_coeff
                        
                         
@@ -29,7 +35,7 @@ def apply_filter(coeff):
 
 def extract_noises(model):
     path_model = './dataset/' + model
-    images = os.listdir(path_model)               
+    images = os.listdir(path_model)              
     
     for image_idx, image in enumerate(images):
         path_cam = path_model + '/' + image 
@@ -62,7 +68,9 @@ def extract_noises(model):
                 img_denoised[:, :, ch] = wrec
                 
       
-            noise_arr = img - img_denoised            
+            noise_arr = img - img_denoised    
+            noise_arr = rgb2gray(noise_arr)
+            
             path_noise = './noises/' + model + '/'            
     
             if not os.path.exists(path_noise):
