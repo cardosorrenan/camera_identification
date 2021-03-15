@@ -14,19 +14,16 @@ def extract_correlation(models_cam):
         
         taken_c = []
         not_taken_c = []
-        rpn = Image.open(f'./references/{model_i}.jpg')
-        rpn = np.asarray(rpn)
-        p = (rpn - rpn.mean()).flatten()
+        path_rpn = f'./reference/{model_i}.jpg'
+        
         
         for model_j in models_cam:
-            noises = os.listdir(f'./noises/{model_j}')
+            noises = os.listdir(f'./noise/{model_j}')
                 
             for noise in noises:
-                print(noise)
-                spn = Image.open(f'./noises/{model_j}/{noise}')
-                spn = np.asarray(spn)
-                n = (spn - spn.mean()).flatten()
-                corr = np.corrcoef(n, p)[0][1]      
+                
+                path_spn = f'./reference/{model_i}.jpg'
+                corr = calc_correlation(path_rpn, path_spn)
                      
                 if model_i == model_j:
                     taken_c.append(corr)                     
@@ -41,9 +38,21 @@ def extract_correlation(models_cam):
         with open(path_corr + f'{model_i}_notTaken.txt', 'w') as f:
             for item in not_taken_c:
                 f.write("%s, " % item)
-
     
-        
+
+def calc_correlation(path_rpn, path_spn):
+    rpn = Image.open(path_rpn)
+    rpn = np.asarray(rpn)
+    p = (rpn - rpn.mean()).flatten()
+    
+    spn = Image.open(path_spn)
+    spn = np.asarray(spn)
+    n = (spn - spn.mean()).flatten()
+    
+    corr = np.corrcoef(n, p)[0][1]
+    
+    return corr
+            
     
     
     

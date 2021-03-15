@@ -8,7 +8,7 @@ def extract_reference(models_cam):
     
     for model in models_cam:
         
-        path_noises = './noises/' + model + '/'
+        path_noises = './noise/' + model + '/'
         noises = os.listdir(path_noises)
         print(noises)
         w, h = Image.open(path_noises + noises[0]).size
@@ -26,7 +26,7 @@ def extract_reference(models_cam):
         arr = arr / N
         
        
-        path_reference = './references/'
+        path_reference = './reference/'
         if not os.path.exists(path_reference):
             os.makedirs(path_reference)
             

@@ -3,7 +3,7 @@ import os
 import ast
 
 
-def extract_threshold(models_cam):
+def extract_exp_histogram(models_cam):
     
     path_corr = './histogram/'
     if not os.path.exists(path_corr):
