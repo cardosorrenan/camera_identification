@@ -1,7 +1,8 @@
-import pywt, os
+import pywt, os, shutil
 import numpy as np
 from PIL import Image
 from skimage.io import imsave
+import random
 
 
 def rgb2gray(rgb):
@@ -33,22 +34,38 @@ def apply_filter(coeff):
     return coeff_filtered
 
 
-def extract_noise_dataset(models_cam):
+
+def extract_noise(models_cam):
+    
+    shutil.rmtree('./noise/', ignore_errors=True)
+    
     for model in models_cam: # Iterate over camera models
-        path_model = './dataset/' + model    
-        images = os.listdir(path_model)    
-        path_noise = './noise/' + model + '/'
+            
+        images = os.listdir(f'./dataset/{model}/')
         
-        if not os.path.exists(path_noise):
-            os.makedirs(path_noise)  
+        random.shuffle(images)
+        train_images = images[0:75]
+        test_images = images[75:]
+        
+        for image in train_images: # Iterate over camera images
+        
+            if not os.path.exists(f'./noise/train/{model}/'):
+                os.makedirs(f'./noise/train/{model}/')
+                
+            path_image =  f'{model}/{image}'
+            extract_spn(path_image, 'train')
             
-        for image_idx, image in enumerate(images): # Iterate over camera images
-            path_img = path_model + '/' + image             
-            noise = extract_noise_single_image(path_img) 
+        for image in test_images: # Iterate over camera images
+        
+            if not os.path.exists(f'./noise/test/{model}/'):
+                os.makedirs(f'./noise/test/{model}/')
+                
+            path_image =  f'{model}/{image}'
+            extract_spn(path_image, 'test')
             
-            
-def extract_noise_single_image(path):
-    img_orig = np.asarray(Image.open(path))
+
+def extract_spn(path, mode):
+    img_orig = np.asarray(Image.open('./dataset/' + path))
     img_crop = img_orig[1500:2012, 1000:1512]        
     img = img_crop
     
@@ -75,14 +92,13 @@ def extract_noise_single_image(path):
             wrec = pywt.waverec2(result_channel, 'db8')
             img_denoised[:, :, ch] = wrec
             
+        noise_arr = img - img_denoised
+        noise_arr = rgb2gray(noise_arr)
+        
+
+                
+        imsave(arr=noise_arr, fname= f'./noise/{mode}/' + path)
+            
     except Exception as e:
         print(e)
-        
-    noise_arr = img - img_denoised    
-    noise_arr = rgb2gray(noise_arr)
-    
-    imsave(arr=noise_arr, fname=path_noise + image)                
-    
-    return noise_arr
-
       

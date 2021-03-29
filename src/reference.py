@@ -1,4 +1,4 @@
-import os
+import os, shutil
 from PIL import Image
 import numpy as np
 from skimage.io import imsave
@@ -6,28 +6,28 @@ from skimage.io import imsave
 
 def extract_reference(models_cam):
     
+    shutil.rmtree('./reference/', ignore_errors=True)
+    
+    if not os.path.exists('./reference/'):
+        os.makedirs('./reference/')
+    
     for model in models_cam:
         
-        path_noises = './noise/' + model + '/'
-        noises = os.listdir(path_noises)
-        print(noises)
-        w, h = Image.open(path_noises + noises[0]).size
-        N = len(noises)
-    
+        noises = os.listdir(f'./noise/train/{model}/')
+        
+        w, h = Image.open(f'./noise/train/{model}/{noises[0]}').size
         arr = np.zeros((w, h), np.float)
+        num_noises = 0
     
-        for im in noises:
+        for noise in noises:
             try:
-                imarr = np.asarray(Image.open(path_noises + im))
+                imarr = np.asarray(Image.open(f'./noise/train/{model}/{noise}'))
                 arr = arr + imarr
+                num_noises += 1
             except Exception as e:
                 print(e)
-        
-        arr = arr / N
-        
-       
-        path_reference = './reference/'
-        if not os.path.exists(path_reference):
-            os.makedirs(path_reference)
+                continue
             
-        imsave(arr=arr, fname= path_reference + model + '.jpg')
+        
+        arr = arr / num_noises
+        imsave(arr=arr, fname=f'./reference/{model}.jpg')
