@@ -94,8 +94,6 @@ def extract_spn(path, mode):
             
         noise_arr = img - img_denoised
         noise_arr = rgb2gray(noise_arr)
-        
-
                 
         imsave(arr=noise_arr, fname= f'./noise/{mode}/' + path)
             
