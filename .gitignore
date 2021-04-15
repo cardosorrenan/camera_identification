@@ -134,3 +134,13 @@ dataset/*
 noises/
 
 noise/
+
+model/
+
+histogram/
+
+reference/
+
+correlation_bin/
+
+correlation/
